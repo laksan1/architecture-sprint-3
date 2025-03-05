@@ -1,0 +1,15 @@
+@startuml
+title Smart Home Monolith Diagram
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+top to bottom direction
+
+Person(customer, "Клиент", "Пользователь")
+Person(support, "Сотрудник", "Тех.поддержка")
+
+
+
+System_Ext(hotHome, "Теплый дом", "Hot Home")
+Rel(user, FitLifeSystem, "Uses the system")
+
+@enduml
