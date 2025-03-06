@@ -1,15 +1,49 @@
 @startuml
-title Smart Home Monolith Diagram
+
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+LAYOUT_TOP_DOWN()
 
 top to bottom direction
 
-Person(customer, "Клиент", "Пользователь")
-Person(support, "Сотрудник", "Тех.поддержка")
+' Определение пользователей
+Person(user, "Пользователь", "Управляет системой отопления и получает данные о температуре.")
+Person(support, "Специалист по установке", "Подключает и настраивает систему отопления.")
+
+' Определение границ системы
+Enterprise_Boundary(monolith, "Монолит / Умный дом ") {
+    Container(ui, "Веб-приложение", "JavaScript/HTML", "Обеспечивает интерфейс для управления системой отопления и мониторинга температуры.")
+
+    System_Boundary(heatingSystem, "Модуль управления отоплением") {
+        Container(heatingContainer, "Блок управления температурой", "Java", "Управляет отоплением, включая/выключая отопительные элементы.")
+
+    }
+    System_Boundary(tempretureSystem, "Модуль управления температурой") {
+        Container(tempretureContainer, "Блок мониторинга температуры", "Java", "Отслеживает и записывает данные о текущей температуре.")
+    }
+
+}
 
 
+' Определение внешних систем (датчики и реле)
+System_Ext(temperatureSensor, "Датчик температуры", "Измеряет и передает температуру в систему для анализа и управления.")
+System_Ext(heatingRelay, "Реле отопления", "Управляет включением/выключением отопительных приборов на основе команд системы.")
 
-System_Ext(hotHome, "Теплый дом", "Hot Home")
-Rel(user, FitLifeSystem, "Uses the system")
+' Определение взаимодействия между ролями и контейнерами
+Rel(user, ui, "Использует веб-приложение для управления системой отопления и мониторинга температуры.")
+Rel(support, ui, "Настраивает систему отопления через интерфейс.")
+
+' Взаимодействие между контейнерами системы
+Rel(ui, heatingContainer, "Запрашивает данные и управляет состоянием отопления.")
+Rel(ui, tempretureContainer, "Запрашивает текущие данные температуры.")
+
+' Взаимодействие контейнеров с внешними системами
+Rel(heatingContainer, heatingRelay, "Отправляет команды для включения/выключения отопления.")
+Rel(tempretureContainer, temperatureSensor, "Получает данные температуры от датчика.")
+
+' Взаимодействие контейнеров внутри системы
+Rel(heatingContainer, temperatureSensor, "Использует данные температуры для корректировки работы отопления.")
+Rel(tempretureContainer, heatingRelay, "Предоставляет данные для корректировки работы отопления в зависимости от температуры.")
 
 @enduml
