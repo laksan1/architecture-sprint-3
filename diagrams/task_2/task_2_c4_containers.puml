@@ -1,0 +1,25 @@
+@startuml
+title "С4 контейнеры"
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+LAYOUT_TOP_DOWN()
+
+' Определение пользователей
+Person(user, "Пользователь")
+
+' Определение границ системы
+System_Boundary(smartHome, "Умный дом") {
+
+    Container(ui, "Веб-приложение", "JavaScript/HTML")
+    Container(apiGateway, "API Gateway", "Авторизация, Кэш, Марушрутизация")
+
+    SystemQueue(Kafka, "Kafka", "Брокер сообщений")
+}
+
+
+' Взаимодействие между контейнерами системы
+Rel(ui, apiGateway, "REST")
+
+@enduml
