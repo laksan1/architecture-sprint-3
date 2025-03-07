@@ -15,6 +15,8 @@ System_Boundary(smartHome, "Умный дом") {
     Container(ui, "Веб-приложение", "JavaScript/HTML")
     Container(apiGateway, "API Gateway", "Авторизация, Кэш, Марушрутизация")
 
+    ContainerDb(nosql, "NoSQL Data Store", "MongoDB 2.2.x", "Stores from RSS/Atom feeds (blog posts) and tweets")
+    
     SystemQueue(Kafka, "Kafka", "Брокер сообщений")
 }
 
