@@ -1,5 +1,6 @@
 @startuml
-title "С4 контейнеры"
+
+title "С4 Контейнеры - Умный дом"
 
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
@@ -8,49 +9,77 @@ LAYOUT_TOP_DOWN()
 LAYOUT_WITH_LEGEND()
 
 ' Определение пользователей
-Person(user, "Пользователь")
+Person(user, "Пользователь", "Владелец умного дома")
 
 ' Определение границ системы
-System_Boundary(smartHome, "Умный дом") {
+System_Boundary(smartHome, "Экосистема Умного Дома") {
 
-    Container(ui, "Веб-приложение", "JavaScript/HTML")
-    Container(apiGateway, "API Gateway", "Авторизация, Кэш, Марушрутизация")
-
-    Container(managmentToolsService, "ManagmentToolsService", "Java", "Контроль и управление всеми подключёнными устройствами")
-
-    Container(telemetryAggregationService, "TelemetryAggregationService", "Java", "Cбор, обработка и анализ данных от подключённых датчиков")
-
-    Container(notificationService, "NotificationService", "Java", "Отвечает за уведомления пользователям и техпподержки")
-
-    Container(identityService, "IdentityService", "Java", "Управляет пользователями, их правами и аутентификацией")
+    Container(ui, "Веб-приложение", "JavaScript/HTML", "Позволяет пользователям управлять системой")
+    Container(apiGateway, "API Gateway", "Spring Cloud Gateway", "Авторизация, кеширование, маршрутизация запросов")
     
-    Container(integrationService, "IntegrationService", "Java", "Отвечает за взаимодействие с оборудованием, включая поддержку сторонних устройств и протоколов")
+    Container(managmentToolsService, "ManagmentToolsService", "Java", "Контроль и управление устройствами") #319439
+    ContainerDb(managmentDb, "Managment DB", "PostgreSQL", "Хранение информации об устройствах")
     
-    Container(supportService, "SupportService", "Java", "Отвечает за техподдержку системы")
-  
-    SystemQueue(kafka, "Kafka", "Брокер сообщений")
+    Container(telemetryAggregationService, "TelemetryAggregationService", "Java", "Сбор, обработка и анализ данных с устройств")  #319439
+    ContainerDb(telemetryDb, "Telemetry DB", "PostgreSQL", "Хранение телеметрических данных")
+    
+    Container(notificationService, "NotificationService", "Java", "Отправка уведомлений пользователям и техподдержке") #319439
+    ContainerDb(notificationDb, "Notification DB", "PostgreSQL", "Хранение истории уведомлений")
+    
+    Container(identityService, "IdentityService", "Java", "Аутентификация и управление пользователями") #319439
+    ContainerDb(identityDb, "Identity DB", "PostgreSQL", "Хранение данных пользователей и ролей")
+    
+    Container(integrationService, "IntegrationService", "Java", "Интеграция со сторонними системами и протоколами")  #319439
+    ContainerDb(integrationDb, "Integration DB", "PostgreSQL", "Хранение настроек интеграций")
+    
+    Container(supportService, "SupportService", "Java", "Обработка запросов в техподдержку")  #319439
+    ContainerDb(supportDb, "Support DB", "PostgreSQL", "Хранение тикетов поддержки")
+    
+    Container(analyticsService, "AnalyticsService", "Python", "Анализ данных и генерация отчетов")  #319439
+    ContainerDb(analyticsDb, "Analytics DB", "ClickHouse", "Хранение аналитических данных")
+    
+    SystemQueue(kafka, "Kafka", "Брокер сообщений для асинхронного взаимодействия сервисов")#232227
+    
+    Container(redis, "Redis", "In-Memory Cache", "Кеширование данных и ускорение запросов") #DC382D
 }
 
-System_Ext(sensors, "Датчики температуры и реле управления", )
+System_Ext(sensors, "Датчики и реле", "Температурные датчики, умные розетки, камеры наблюдения")
 
-' Взаимодействие между контейнерами мимкросервисами
-Rel(user, ui, "REST")
-Rel(ui, apiGateway, "REST")
+' Взаимодействие между контейнерами
+Rel(user, ui, "Взаимодействие через браузер (HTTPS)")
+Rel(ui, apiGateway, "Запросы к API (REST over HTTPS)")
 
-Rel(apiGateway, managmentToolsService, "REST")
-Rel(apiGateway, telemetryAggregationService, "REST")
-Rel(apiGateway, identityService, "REST")
-Rel(apiGateway, integrationService, "REST")
-Rel(apiGateway, supportService, "REST")
-Rel(apiGateway, notificationService, "REST")
+Rel(apiGateway, managmentToolsService, "Маршрутизация команд управления устройствами")
+Rel(apiGateway, telemetryAggregationService, "Запрос телеметрических данных")
+Rel(apiGateway, identityService, "Аутентификация и авторизация пользователей")
+Rel(apiGateway, integrationService, "Интеграция с внешними сервисами")
+Rel(apiGateway, supportService, "Создание и обработка тикетов поддержки")
+Rel(apiGateway, notificationService, "Отправка уведомлений пользователям")
+Rel(apiGateway, analyticsService, "Запрос аналитики и отчетов")
 
-' Взаимодействие между датчиками системы
-Rel(managmentToolsService, sensors, "Взаимодействие между датчиками системы")
-Rel(telemetryAggregationService, sensors, "Сбор данных с датчиков")
+' Взаимодействие с датчиками
+Rel(managmentToolsService, sensors, "Передача команд через MQTT/WebSockets")
+Rel(telemetryAggregationService, sensors, "Сбор данных через MQTT/WebSockets")
 
-' Взаимодействие между брокером сообщений
-Rel(notificationService, kafka, "AsyncAPI")
-Rel(managmentToolsService, kafka, "AsyncAPI")
-Rel(integrationService, kafka, "AsyncAPI")
+' Взаимодействие с брокером сообщений
+Rel(notificationService, kafka, "Отправка событий уведомлений (Async API)")
+Rel(managmentToolsService, kafka, "Передача команд управления (Async API)")
+Rel(integrationService, kafka, "Обмен данными с внешними системами (Async API)")
+Rel(telemetryAggregationService, kafka, "Передача телеметрических данных (Async API)")
+Rel(analyticsService, kafka, "Получение событий и данных для анализа (Async API)")
+
+' Взаимодействие с базами данных
+Rel(managmentToolsService, managmentDb, "Запросы к базе данных (SQL Queries)")
+Rel(telemetryAggregationService, telemetryDb, "Сохранение и анализ телеметрии (SQL Queries)")
+Rel(identityService, identityDb, "Управление пользователями (SQL Queries)")
+Rel(integrationService, integrationDb, "Хранение параметров интеграций (SQL Queries)")
+Rel(supportService, supportDb, "Хранение и обработка тикетов (SQL Queries)")
+Rel(notificationService, notificationDb, "Сохранение истории уведомлений (SQL Queries)")
+Rel(analyticsService, analyticsDb, "Сохранение и обработка аналитических данных (SQL Queries)")
+
+' Взаимодействие с кешем
+Rel(apiGateway, redis, "Кеширование данных для уменьшения нагрузки")
+Rel(notificationService, redis, "Хранение временных данных для уведомлений")
+Rel_D(analyticsService, redis, "Кеширование результатов аналитики")
 
 @enduml
