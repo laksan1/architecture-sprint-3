@@ -41,7 +41,7 @@ System_Boundary(smartHome, "Экосистема Умного Дома") {
     ContainerDb(analyticsDb, "Analytics DB", "ClickHouse", "Хранение аналитических данных")
     
 ' Брокер сообщений
-    SystemQueue(kafka, "Kafka", "Брокер сообщений для асинхронного взаимодействия сервисов")#232227
+    SystemQueue(kafka, "Kafka", "Брокер сообщений для асинхронного взаимодействия сервисов") #232227
     
 'Кэш
     Container(redis, "Redis", "In-Memory Cache", "Кеширование данных и ускорение запросов") #DC382D

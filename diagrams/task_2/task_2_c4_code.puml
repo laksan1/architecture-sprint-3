@@ -1,0 +1,23 @@
+@startuml
+
+title "С4 Код - Умный дом"
+
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+class TetsAPIService {
+    + ITestInterface name
+    + runCommand()
+}
+
+interface ITestInterface {
+    + enable()
+
+}
+
+class TestDevice {
+    + turnOn()
+    + turnOff()
+}
+
+TetsAPIService -down-> TestDevice
+@enduml

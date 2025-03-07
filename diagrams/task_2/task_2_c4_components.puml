@@ -19,19 +19,52 @@ System_Boundary(smartHome, "Экосистема Умного Дома") {
 
 'Компоненты микросервисов
 
-    Container_Boundary(managmentToolsContainer,"Контроль и управление устройствами") {
-    LAYOUT_TOP_DOWN()
-    
-       Component(managmentToolsComponent, "ManagmentToolsService", "Java", "Хранение информации об устройствах")
+    Container_Boundary(managmentToolsContainer,"Контроль и управление устройствами")  {
+      LAYOUT_TOP_DOWN()
+       Component(managmentToolsComponent, "ManagmentToolsService", "Java", "Хранение информации об устройствах") #5743b1
        ContainerDb(managmentDb, "Managment DB", "PostgreSQL", "Хранение информации об устройствах")
     }
 
-    Container_Boundary(kafkaContainer,"Брокер сообщений") {
-       SystemQueue(kafkaComponent, "Брокер сообщений", "Взаимодействие между сервисами", )
+      Container_Boundary(telemetryAggregationContainer,"Сбор, обработка и анализ данных с устройств") {
+         Component(telemetryAggregationComponent, "TelemetryAggregationService", "Java", "Хранение телеметрических данных")  #5743b1
+         ' Добавить сюда компонентов
+         ContainerDb(telemetryDb, "Telemetry DB", "PostgreSQL", "Хранение телеметрических данных")
     }
 
-    Container_Boundary(redisContainer,"In-Memory Cache") {
-       Container(redisCoьmponent, "Брокер сообщений", "Кеширование данных и ускорение запросов") #DC382D
+     Container_Boundary(notificationContainer,"Отправка уведомлений пользователям и техподдержке")  {
+         Component(notificationComponent, "NotificationService", "Java", "Хранение истории уведомлений") #5743b1
+         ContainerDb(notificationDb, "Notification DB", "PostgreSQL", "Хранение истории уведомлений")
+    }
+
+      Container_Boundary(identityContainer,"Аутентификация и управление пользователями")  {
+         Component(identityComponent, "IdentityService", "Java", "Хранение данных пользователей и ролей") #5743b1
+         ContainerDb(identityDb, "Identity DB", "PostgreSQL", "Хранение данных пользователей и ролей")
+    }
+
+   Container_Boundary(integrationContainer,"Интеграция со сторонними системами и протоколами") {
+         Component(integrationComponent, "IntegrationService", "Java", "Хранение настроек интеграций") #5743b1
+         ContainerDb(integrationDb, "Integration DB", "PostgreSQL", "Хранение настроек интеграций")
+    }
+
+   Container_Boundary(supportContainer,"Обработка запросов в техподдержку") {
+         Component(supportComponent, "SupportService", "Java", "Хранение тикетов поддержки") #5743b1 
+         ContainerDb(supportDb, "Support DB", "PostgreSQL", "Хранение тикетов поддержки")
+    }
+
+
+   Container_Boundary(analyticsContainer,"Анализ данных и генерация отчетов") {
+         Component(analyticsComponent, "AnalyticsService", "Java", "Хранение аналитических данных") #5743b1 
+         ContainerDb(analyticsDb, "Analytics DB", "ClickHouse", "Хранение аналитических данных")
+    }
+
+'---------------------------------------------------------------------------------------------------------------------
+
+    Container_Boundary(kafkaContainer,"Брокер сообщений")   {
+       SystemQueue(kafkaComponent, "Брокер сообщений", "Взаимодействие между сервисами", ) #232227
+    }
+
+    Container_Boundary(redisContainer,"In-Memory Cache")  {
+       Container(redisComponent, "Брокер сообщений", "Кеширование данных и ускорение запросов") #DC382D
     }
 }
 
@@ -41,10 +74,20 @@ Rel(user, smartHome, "Взаимодействие через браузер (HT
 Rel(ui, apiGateway, "Rest")
 
 Rel(apiGateway, managmentToolsContainer, "Rest")
+Rel(apiGateway, telemetryAggregationContainer, "Rest")
+Rel(apiGateway, notificationContainer, "Rest")
+Rel(apiGateway, identityContainer, "Rest")
+Rel(apiGateway, integrationContainer, "Rest")
+Rel(apiGateway, supportContainer, "Rest")
+Rel(apiGateway, analyticsContainer, "Rest")
 
 
 ' Взаимодействие с брокером сообщений
-Rel(managmentToolsContainer, kafkaContainer, "Отправка событий уведомлений (Async API)")
+Rel(managmentToolsContainer, kafka, "Отправка событий уведомлений (Async API)")
+Rel(notificationContainer, kafka, "Передача команд управления (Async API)")
+Rel(integrationContainer, kafka, "Обмен данными с внешними системами (Async API)")
+Rel(telemetryAggregationContainer, kafka, "Передача телеметрических данных (Async API)")
+Rel(analyticsContainer, kafka, "Получение событий и данных для анализа (Async API)")
 
 ' Взаимодействие с кешем
 Rel(apiGateway, redisContainer, "Кеширование данных для уменьшения нагрузки")
