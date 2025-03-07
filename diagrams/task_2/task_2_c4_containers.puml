@@ -5,6 +5,7 @@ title "С4 контейнеры"
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
 
 LAYOUT_TOP_DOWN()
+LAYOUT_WITH_LEGEND()
 
 ' Определение пользователей
 Person(user, "Пользователь")
@@ -15,13 +16,41 @@ System_Boundary(smartHome, "Умный дом") {
     Container(ui, "Веб-приложение", "JavaScript/HTML")
     Container(apiGateway, "API Gateway", "Авторизация, Кэш, Марушрутизация")
 
-    ContainerDb(nosql, "NoSQL Data Store", "MongoDB 2.2.x", "Stores from RSS/Atom feeds (blog posts) and tweets")
+    Container(managmentToolsService, "ManagmentToolsService", "Java", "Контроль и управление всеми подключёнными устройствами")
+
+    Container(telemetryAggregationService, "TelemetryAggregationService", "Java", "Cбор, обработка и анализ данных от подключённых датчиков")
+
+    Container(notificationService, "NotificationService", "Java", "Отвечает за уведомления пользователям и техпподержки")
+
+    Container(identityService, "IdentityService", "Java", "Управляет пользователями, их правами и аутентификацией")
     
-    SystemQueue(Kafka, "Kafka", "Брокер сообщений")
+    Container(integrationService, "IntegrationService", "Java", "Отвечает за взаимодействие с оборудованием, включая поддержку сторонних устройств и протоколов")
+    
+    Container(supportService, "SupportService", "Java", "Отвечает за техподдержку системы")
+  
+    SystemQueue(kafka, "Kafka", "Брокер сообщений")
 }
 
+System_Ext(sensors, "Датчики температуры и реле управления", )
 
-' Взаимодействие между контейнерами системы
+' Взаимодействие между контейнерами мимкросервисами
+Rel(user, ui, "REST")
 Rel(ui, apiGateway, "REST")
+
+Rel(apiGateway, managmentToolsService, "REST")
+Rel(apiGateway, telemetryAggregationService, "REST")
+Rel(apiGateway, identityService, "REST")
+Rel(apiGateway, integrationService, "REST")
+Rel(apiGateway, supportService, "REST")
+Rel(apiGateway, notificationService, "REST")
+
+' Взаимодействие между датчиками системы
+Rel(managmentToolsService, sensors, "Взаимодействие между датчиками системы")
+Rel(telemetryAggregationService, sensors, "Сбор данных с датчиков")
+
+' Взаимодействие между брокером сообщений
+Rel(notificationService, kafka, "AsyncAPI")
+Rel(managmentToolsService, kafka, "AsyncAPI")
+Rel(integrationService, kafka, "AsyncAPI")
 
 @enduml
