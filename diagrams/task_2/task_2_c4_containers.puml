@@ -14,9 +14,11 @@ Person(user, "Пользователь", "Владелец умного дома
 ' Определение границ системы
 System_Boundary(smartHome, "Экосистема Умного Дома") {
 
+' Frontend и API Gateway 
     Container(ui, "Веб-приложение", "JavaScript/HTML", "Позволяет пользователям управлять системой")
     Container(apiGateway, "API Gateway", "Spring Cloud Gateway", "Авторизация, кеширование, маршрутизация запросов")
-    
+
+' Определение микросервисов
     Container(managmentToolsService, "ManagmentToolsService", "Java", "Контроль и управление устройствами") #319439
     ContainerDb(managmentDb, "Managment DB", "PostgreSQL", "Хранение информации об устройствах")
     
@@ -38,8 +40,10 @@ System_Boundary(smartHome, "Экосистема Умного Дома") {
     Container(analyticsService, "AnalyticsService", "Python", "Анализ данных и генерация отчетов")  #319439
     ContainerDb(analyticsDb, "Analytics DB", "ClickHouse", "Хранение аналитических данных")
     
+' Брокер сообщений
     SystemQueue(kafka, "Kafka", "Брокер сообщений для асинхронного взаимодействия сервисов")#232227
     
+'Кэш
     Container(redis, "Redis", "In-Memory Cache", "Кеширование данных и ускорение запросов") #DC382D
 }
 

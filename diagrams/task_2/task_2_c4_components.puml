@@ -1,0 +1,52 @@
+@startuml
+
+title "С4 Компоненты - Умный дом"
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_TOP_DOWN()
+LAYOUT_WITH_LEGEND()
+
+' Определение пользователей
+Person(user, "Пользователь", "Владелец умного дома")
+
+' Определение границ системы
+System_Boundary(smartHome, "Экосистема Умного Дома") {
+
+' Frontend и API Gateway 
+    Container(ui, "Веб-приложение", "JavaScript/HTML", "Позволяет пользователям управлять системой")
+    Container(apiGateway, "API Gateway", "Spring Cloud Gateway", "Авторизация, кеширование, маршрутизация запросов")
+
+'Компоненты микросервисов
+
+    Container_Boundary(managmentToolsContainer,"Контроль и управление устройствами") {
+    LAYOUT_TOP_DOWN()
+    
+       Component(managmentToolsComponent, "ManagmentToolsService", "Java", "Хранение информации об устройствах")
+       ContainerDb(managmentDb, "Managment DB", "PostgreSQL", "Хранение информации об устройствах")
+    }
+
+    Container_Boundary(kafkaContainer,"Брокер сообщений") {
+       SystemQueue(kafkaComponent, "Брокер сообщений", "Взаимодействие между сервисами", )
+    }
+
+    Container_Boundary(redisContainer,"In-Memory Cache") {
+       Container(redisCoьmponent, "Брокер сообщений", "Кеширование данных и ускорение запросов") #DC382D
+    }
+}
+
+
+' Взаимодействие между контейнерами
+Rel(user, smartHome, "Взаимодействие через браузер (HTTPS)")
+Rel(ui, apiGateway, "Rest")
+
+Rel(apiGateway, managmentToolsContainer, "Rest")
+
+
+' Взаимодействие с брокером сообщений
+Rel(managmentToolsContainer, kafkaContainer, "Отправка событий уведомлений (Async API)")
+
+' Взаимодействие с кешем
+Rel(apiGateway, redisContainer, "Кеширование данных для уменьшения нагрузки")
+
+@enduml
