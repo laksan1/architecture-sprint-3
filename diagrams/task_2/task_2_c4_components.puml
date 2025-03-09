@@ -23,7 +23,11 @@ System_Boundary(smartHome, "Экосистема Умного Дома") {
         Component(deviceRegistrationComponent, "DeviceRegistrationController", "Java", "Регистрация и верификация устройств")
         Component(deviceControlComponent, "DeviceControlController", "Java", "Управление командами для устройств")
         Component(deviceStatusComponent, "DeviceStatus", "Java", "Мониторинг состояния устройств")
-        ContainerDb(managmentDb, "Managment DB", "PostgreSQL", "Хранение информации об устройствах")
+        Component(lightingControlComponent, "LightingControlComponent", "Java", "Управление светом")
+        Component(gateControlComponent, "GateControlComponent", "Java", "Управление воротами")
+        Component(videoObservationControlComponent, "VideoObservationControlComponent", "Java", "Управление видеонаблюдением")
+
+        ContainerDb(managmentToolsDb, "Managment DB", "PostgreSQL", "Хранение информации об устройствах")
     }
 
     Container_Boundary(telemetryAggregationContainer, "Сбор, обработка и анализ данных с устройств") {
@@ -48,6 +52,10 @@ System_Boundary(smartHome, "Экосистема Умного Дома") {
 
     Container_Boundary(supportContainer, "Обработка запросов в техподдержку") {
         Component(ticketManagementComponent, "TicketManagementController", "Java", "Обработка тикетов и запросов пользователей")
+        Component(userSupportComponent, "UserSupportController", "Java", "Управление пользователями, связанные с тикетами поддержки")
+        Component(ticketAssignmentComponent, "TicketAssignmentController", "Java", "Назначение тикетов на техподдержку и команды")
+        Component(ticketHistoryComponent, "TicketHistoryController", "Java", "Просмотр истории изменений и статусов тикетов")
+    
         ContainerDb(supportDb, "Support DB", "PostgreSQL", "Хранение тикетов поддержки")
     }
 
@@ -81,9 +89,12 @@ Rel(apiGateway, supportContainer, "Создание и обработка тик
 Rel(apiGateway, analyticsContainer, "Запрос аналитики (REST API)")
 
 ' Взаимодействие между компонентами микросервисов
-Rel(deviceRegistrationComponent, managmentDb, "Регистрация устройств (REST API)")
-Rel(deviceControlComponent, managmentDb, "Отправка команд устройствам (REST API)")
-Rel(deviceStatusComponent, managmentDb, "Получение состояния устройств (REST API)")
+Rel(deviceRegistrationComponent, managmentToolsDb, "Регистрация устройств (REST API)")
+Rel(deviceControlComponent, managmentToolsDb, "Отправка команд устройствам (REST API)")
+Rel(deviceStatusComponent, managmentToolsDb, "Получение состояния устройств (REST API)")
+Rel(lightingControlComponent, managmentToolsDb, "Управление светом (REST API)")
+Rel(gateControlComponent, managmentToolsDb, "Управление воротами (REST API)")
+Rel(videoObservationControlComponent, managmentToolsDb, "Упарвление видеонаблюдением (REST API)")
 
 Rel(telemetryProcessorComponent, telemetryDb, "Чтение и запись данных телеметрии")
 
@@ -94,6 +105,11 @@ Rel(userManagementComponent, identityDb, "Чтение и запись данн�
 Rel(externalDeviceIntegrationComponent, integrationDb, "Чтение и запись настроек интеграции")
 
 Rel(ticketManagementComponent, supportDb, "Запись тикетов в базу данных")
+Rel(userSupportComponent, supportDb, "Запись тикетов в базу данных")
+Rel(ticketAssignmentComponent, supportDb, "Запись тикетов в базу данных")
+Rel(ticketHistoryComponent, supportDb, "Запись тикетов в базу данных")
+
+Rel(dataAnalyzerComponent, analyticsDb, "Запись данных аналитики")
 
 ' Взаимодействие между микросервисами через брокер сообщений
 Rel(managmentToolsContainer, kafkaComponent, "Отправка событий управления устройствами (Async API)")
