@@ -17,7 +17,7 @@ System_Boundary(smartHome, "Экосистема Умного Дома") {
     Container(ui, "Веб-приложение", "JavaScript/HTML", "Позволяет пользователям управлять системой")
     Container(apiGateway, "API Gateway", "Spring Cloud Gateway", "Авторизация, кеширование, маршрутизация запросов")
 
-' Микросервисы
+' Компоненты
 
     Container_Boundary(managmentToolsContainer, "Контроль и управление устройствами") {
         Component(deviceRegistrationComponent, "DeviceRegistrationController", "Java", "Регистрация и верификация устройств")
