@@ -1,0 +1,43 @@
+@startuml
+title Smart Home ER diagram
+
+entity  User {
+    * id : UUID
+    --
+    name : String
+    email : String
+    password : String
+    metadata : any
+}
+
+entity  House {
+    * id : UUID
+    --
+
+}
+
+entity  Device {
+    * id : UUID
+    --
+
+}
+
+entity  DeviceType {
+    * id : UUID
+    --
+
+}
+
+entity  Module {
+    * id : UUID
+    --
+
+}
+
+entity  TelemetryData {
+    * id : UUID
+    --
+
+}
+
+@enduml
