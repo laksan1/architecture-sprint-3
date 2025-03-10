@@ -1,5 +1,6 @@
 @startuml
-title Smart Home ER diagram
+
+title ER диаграмма
 
 entity  User {
     * id : UUID
@@ -7,25 +8,32 @@ entity  User {
     name : String
     email : String
     password : String
-    metadata : any
 }
 
 entity  House {
     * id : UUID
     --
+    user_id: UUID
+    name: String
+    location: String
+    devices: Device[]
+    serial_number: Number
 
 }
 
 entity  Device {
     * id : UUID
     --
-
+    name: String
+    status: String
+    house_id: UUID
+    type_id: UUID
 }
 
 entity  DeviceType {
     * id : UUID
     --
-
+    name: String
 }
 
 entity  Module {
@@ -39,5 +47,8 @@ entity  TelemetryData {
     --
 
 }
+
+User ||--o{ House
+House ||--o{ Device
 
 @enduml
