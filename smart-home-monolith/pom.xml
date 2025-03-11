@@ -41,11 +41,13 @@
             <scope>runtime</scope>
         </dependency>
 
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-boot-starter</artifactId>
-            <version>${springfox-swagger.version}</version>
-        </dependency>
+<!--        &lt;!&ndash; Swagger &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>io.springfox</groupId>-->
+<!--            <artifactId>springfox-boot-starter</artifactId>-->
+<!--            <version>${springfox-swagger.version}</version>-->
+<!--        </dependency>-->
+
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
