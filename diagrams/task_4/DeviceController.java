@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.smarthome.dto.DeviceDto;
 import ru.yandex.practicum.smarthome.service.DeviceService;
+import ru.yandex.practicum.smarthome.service.KafkaProducerService;
 
 @RestController
 @RequestMapping("/api/devices")
@@ -16,6 +17,7 @@ import ru.yandex.practicum.smarthome.service.DeviceService;
 public class DeviceController {
 
     private final DeviceService deviceService;
+    private final KafkaProducerService kafkaProducerService;
 
     @ApiOperation(value = "Получить оборудование по id", response = DeviceDto.class)
     @GetMapping("/{id}")
@@ -49,6 +51,10 @@ public class DeviceController {
     public ResponseEntity<Void> setTemperature(@ApiParam(value = "Device ID", required = true) @PathVariable("id") Long id,
                                                @RequestParam double temperature) {
         deviceService.setTargetTemperature(id, temperature);
+        
+        // Асинхронное отправление сообщения в Kafka (AsyncAPI)
+        kafkaProducerService.sendTemperatureUpdate(id, temperature);
+        
         return ResponseEntity.noContent().build();
     }
 }
