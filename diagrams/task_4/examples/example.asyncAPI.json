@@ -1,0 +1,18 @@
+{
+  "asyncapi": "2.0.0",
+  "info": {
+    "title": "Smart Home Async API",
+    "version": "1.0.0",
+    "description": "Документация AsyncAPI для событий Kafka"
+  },
+  "channels": {
+    "temperature-topic": {
+      "subscribe": {
+        "summary": "Получение обновлений температуры"
+      },
+      "publish": {
+        "summary": "Отправка данных о температуре устройства"
+      }
+    }
+  }
+}
