@@ -1,19 +1,20 @@
 package ru.yandex.practicum.smarthome.service;
 
-import org.apache.kafka.clients.producer.ProducerRecord;
+import io.github.springwolf.annotations.AsyncApi;
+import io.github.springwolf.annotations.PublishOperation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
+@AsyncApi // Аннотация для генерации AsyncAPI
 public class KafkaProducerService {
+
     private final KafkaTemplate<String, String> kafkaTemplate;
 
-    public KafkaProducerService(KafkaTemplate<String, String> kafkaTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
-    }
-
-    public void sendTemperatureUpdate(Long deviceId, double temperature) {
-        String message = String.format("Оборудование ID: %d, Температура: ", deviceId, temperature);
-        kafkaTemplate.send(new ProducerRecord<>("temperature-topic", String.valueOf(deviceId), message));
+    @PublishOperation(channelName = "temperature-topic", description = "Отправка данных о температуре устройства") // Аннотация для генерации AsyncAPI
+    public void sendTemperatureUpdate(String message) {
+        kafkaTemplate.send("temperature-topic", message);
     }
 }
