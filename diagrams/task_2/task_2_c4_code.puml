@@ -1,0 +1,76 @@
+@startuml
+' Настройки для улучшенного визуального восприятия
+skinparam classAttributeIconSize 0
+skinparam classFontSize 12
+skinparam classFontName "Arial"
+skinparam classBackgroundColor #f2f2f2
+skinparam classBorderColor #555555
+skinparam classArrowColor #3A8C74
+skinparam classHeaderFontColor #ffffff
+skinparam classHeaderBackgroundColor #3A8C74
+skinparam classFontColor #333333
+
+' Контейнеры
+package "Management Tools" {
+  class DeviceRegistrationController {
+    +String deviceId                : Идентификатор устройства
+    +Object deviceData              : Данные устройства для регистрации
+    +registerDevice(deviceId: String, deviceData: Object) : Регистрация устройства
+    +verifyDevice(deviceId: String) : boolean : Верификация устройства
+  }
+
+  class DeviceControlController {
+    +String deviceId                : Идентификатор устройства
+    +String command                 : Команда для устройства
+    +String deviceStatus            : Текущее состояние устройства
+    +sendCommand(deviceId: String, command: String) : Отправить команду устройству
+    +getDeviceStatus(deviceId: String) : String : Получить состояние устройства
+  }
+
+  class DeviceStatus {
+    +String deviceId                : Идентификатор устройства
+    +String status                  : Текущее состояние устройства
+    +Date lastUpdated               : Дата последнего обновления
+    +getStatus(deviceId: String) : String : Получить состояние устройства
+    +updateStatus(deviceId: String, status: String) : Обновить состояние
+  }
+
+  class LightingControlComponent {
+    +String deviceId                : Идентификатор устройства освещения
+    +String lightingCommand         : Команда для управления освещением
+    +controlLighting(deviceId: String, lightingCommand: String) : Управление освещением
+  }
+
+  class GateControlComponent {
+    +String deviceId                : Идентификатор устройства ворот
+    +String gateCommand             : Команда для управления воротами
+    +controlGate(deviceId: String, gateCommand: String) : Управление воротами
+  }
+
+  class VideoObservationControlComponent {
+    +String deviceId                : Идентификатор устройства видеонаблюдения
+    +String videoCommand            : Команда для управления видеонаблюдением
+    +controlVideo(deviceId: String, videoCommand: String) : Управление видеонаблюдением
+  }
+
+  class ManagmentToolsDB {
+    +String deviceId                : Идентификатор устройства
+    +Object deviceData              : Данные устройства
+    +String status                  : Статус устройства
+    +storeDeviceData(deviceId: String, data: Object) : Сохранить данные устройства
+    +fetchDeviceStatus(deviceId: String) : String : Получить статус устройства
+  }
+}
+
+' Связи между компонентами
+DeviceRegistrationController "1" -- "0..*" DeviceControlController : Взаимодействует с
+DeviceControlController "1" -- "0..*" DeviceStatus : Проверяет и обновляет состояние
+DeviceControlController "1" -- "0..*" LightingControlComponent : Отправляет команды на освещение
+DeviceControlController "1" -- "0..*" GateControlComponent : Отправляет команды на ворота
+DeviceControlController "1" -- "0..*" VideoObservationControlComponent : Отправляет команды на видеонаблюдение
+DeviceStatus "1" -- "1" ManagmentToolsDB : Сохраняет и извлекает данные
+LightingControlComponent "1" -- "1" ManagmentToolsDB : Сохраняет и извлекает данные
+GateControlComponent "1" -- "1" ManagmentToolsDB : Сохраняет и извлекает данные
+VideoObservationControlComponent "1" -- "1" ManagmentToolsDB : Сохраняет и извлекает данные
+
+@enduml
